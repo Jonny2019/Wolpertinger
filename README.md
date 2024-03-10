@@ -75,3 +75,13 @@ The JSON file could look like this:
   ]
 }
 ```
+
+## IndexedDB
+The newest release also contains a logic to save translations that have been retrieved from a server in a local database (IndexedDB).
+
+This functionality is still under development!
+
+This feature is enabled by default. To disable this feature, set the option `useSavedTranslations` to `false` in the constructor like this:
+```ts
+new Wolpertinger<BestMatch>("../translations.json", undefined, BestMatch, useSavedTranslations=false);
+```

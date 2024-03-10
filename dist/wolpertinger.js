@@ -11,9 +11,11 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.Wolpertinger = void 0;
 const translation_strategy_1 = require("./translation-strategy");
+const database_1 = require("./database");
 class Wolpertinger {
-    constructor(srcFile, srcString, _createTranslationStrategy) {
+    constructor(srcFile, srcString, _createTranslationStrategy, useSavedTranslations = true) {
         this._createTranslationStrategy = _createTranslationStrategy;
+        this.useSavedTranslations = useSavedTranslations;
         this._isReadyToTranslate = false;
         this.combinedTranslations = [];
         this.translationStrategy = new this._createTranslationStrategy();
@@ -67,40 +69,83 @@ class Wolpertinger {
             });
         });
     }
+    fetchTranslationsFile(url) {
+        return __awaiter(this, void 0, void 0, function* () {
+            return new Promise((resolve, reject) => {
+                fetch(url, {
+                    method: "GET",
+                    headers: {
+                        Accept: "application/json"
+                    },
+                    cache: "default"
+                }).then((response) => response.json()).then(json => {
+                    const translations = json.translations;
+                    this.combinedTranslations = this.combinedTranslations.concat(translations);
+                    resolve(translations);
+                }).catch(reason => {
+                    reject();
+                });
+            });
+        });
+    }
     loadSources(rejectWhenError) {
         return __awaiter(this, void 0, void 0, function* () {
             const numberOfSources = this.scrFiles.length + this.srcStrings.length;
             let numberOfLoadedSources = 0;
             return new Promise((resolve, reject) => {
                 this.scrFiles.forEach((url) => {
-                    fetch(url, {
-                        method: "GET",
-                        headers: {
-                            Accept: "application/json"
-                        },
-                        cache: "default"
-                    }).then((response) => response.json()).then(json => {
-                        this.combinedTranslations = this.combinedTranslations.concat(json.translations);
-                        numberOfLoadedSources++;
-                        if (numberOfLoadedSources === numberOfSources) {
-                            this.evaluateSources().then(() => {
-                                resolve(true);
+                    if (this.useSavedTranslations) {
+                        if (this.database === undefined) {
+                            this.database = new database_1.Database((success) => {
+                                if (success && this.database != undefined) {
+                                    this.database.areTranslationsSaved(url)
+                                        .then((entry) => {
+                                        if (entry === undefined) {
+                                            this.fetchTranslationsFile(url).then((translationObjects) => {
+                                                const translations = [];
+                                                translationObjects.forEach((translationObject) => {
+                                                    translationObject.values.forEach((langValPair) => {
+                                                        translations.push(new translation_strategy_1.Translation(translationObject.key, langValPair.value, langValPair.lang));
+                                                    });
+                                                });
+                                                this.database.addFileEntry(url).then((fileId) => {
+                                                    this.database.saveTranslations(fileId, translations);
+                                                });
+                                            });
+                                        }
+                                        else {
+                                            this.database.getTranslationsWithFileId(entry.id).then((entries) => {
+                                                console.log(entries);
+                                                this.translationStrategy.addTranslationsFromDatabase(entries);
+                                            });
+                                        }
+                                    });
+                                }
                             });
                         }
-                    })
-                        .catch(reason => {
-                        numberOfLoadedSources++;
-                        if (rejectWhenError) {
-                            reject("Source could not be loaded or interpreted.");
-                        }
-                        else if (numberOfLoadedSources === numberOfSources) {
-                            this._isReadyToTranslate = true;
-                            resolve(true);
-                        }
-                        else {
-                            resolve(false);
-                        }
-                    });
+                    }
+                    else {
+                        this.fetchTranslationsFile(url).then(() => {
+                            numberOfLoadedSources++;
+                            if (numberOfLoadedSources === numberOfSources) {
+                                this.evaluateSources().then(() => {
+                                    this._isReadyToTranslate = true;
+                                    resolve(true);
+                                });
+                            }
+                        }).catch(reason => {
+                            numberOfLoadedSources++;
+                            if (rejectWhenError) {
+                                reject("Source could not be loaded or interpreted.");
+                            }
+                            else if (numberOfLoadedSources === numberOfSources) {
+                                this.evaluateSources().then(() => {
+                                    this._isReadyToTranslate = true;
+                                    resolve(true);
+                                });
+                            }
+                        });
+                    }
                 });
                 this.srcStrings.forEach((srcString) => {
                     this.combinedTranslations = this.combinedTranslations.concat(JSON.parse(srcString).translations);

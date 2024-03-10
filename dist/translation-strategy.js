@@ -99,6 +99,8 @@ class AllSameLanguage extends TranslationStrategy {
             }
         }
     }
+    addTranslationsFromDatabase(translations) {
+    }
 }
 exports.AllSameLanguage = AllSameLanguage;
 class BestMatch extends TranslationStrategy {
@@ -135,6 +137,8 @@ class BestMatch extends TranslationStrategy {
         }
     }
     findTargetLanguage(translations) {
+    }
+    addTranslationsFromDatabase(translations) {
     }
 }
 exports.BestMatch = BestMatch;

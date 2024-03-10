@@ -8,7 +8,7 @@ interface OccurrenceCounter {
 
 export class Translation {
     constructor(
-        private readonly key: string,
+        public readonly key: string,
         public readonly text: string,
         public readonly language: string
     ) {}
@@ -43,6 +43,8 @@ export abstract class TranslationStrategy {
     abstract applyStrategy(key: string, options: Translation[]): Translation;
 
     abstract findTargetLanguage(translations: TranslationObject[]): void;
+
+    abstract addTranslationsFromDatabase(translations: TranslationDatabaseEntry[]): void;
 
     public async translate(key: string): Promise<string> {
         return new Promise((resolve, reject) => {
@@ -112,6 +114,9 @@ export class AllSameLanguage extends TranslationStrategy {
 
     }
 
+    addTranslationsFromDatabase(translations: TranslationDatabaseEntry[]): void {
+    }
+
 }
 
 export class BestMatch extends TranslationStrategy {
@@ -149,6 +154,9 @@ export class BestMatch extends TranslationStrategy {
     }
 
     override findTargetLanguage(translations: TranslationObject[]) {
+    }
+
+    addTranslationsFromDatabase(translations: TranslationDatabaseEntry[]): void {
     }
 
 }
