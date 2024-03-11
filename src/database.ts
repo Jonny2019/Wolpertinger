@@ -87,8 +87,7 @@ export class Database {
                 language: translation.language,
                 translation: translation.text
             };
-            if (this.translationsStore === undefined)
-                this.translationsStore = this.savedTranslationsStore;
+            this.translationsStore = this.savedTranslationsStore;
 
             this.translationsStore.add(obj);
         });
@@ -96,8 +95,7 @@ export class Database {
 
     public async addFileEntry(url: string): Promise<number> {
         return new Promise((resolve, reject) => {
-            if (this.filesStore === undefined)
-                this.filesStore = this.savedFilesStore;
+            this.filesStore = this.savedFilesStore;
 
             const obj: FileDatabaseEntryPrototype = {
                 timestamp: Date.now(),
@@ -132,8 +130,7 @@ export class Database {
 
     public async areTranslationsSaved(url: string): Promise<FileDatabaseEntry | undefined> {
         return new Promise((resolve) => {
-            if (this.filesStore === undefined)
-                this.filesStore = this.savedFilesStore;
+            this.filesStore = this.savedFilesStore;
 
             const cursorRequest: IDBRequest<IDBCursorWithValue | null> = this.filesStore.openCursor();
             cursorRequest.onsuccess = (event: Event) => {
@@ -158,9 +155,7 @@ export class Database {
 
     public async getTranslationsWithFileId(fileId: number): Promise<TranslationDatabaseEntry[]> {
         return new Promise((resolve, reject) => {
-            if (this.translationsStore === undefined) {
-                this.translationsStore = this.savedTranslationsStore;
-            }
+            this.translationsStore = this.savedTranslationsStore;
 
             const translations: TranslationDatabaseEntry[] = [];
 

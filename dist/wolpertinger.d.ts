@@ -8,6 +8,7 @@ export declare class Wolpertinger<T extends TranslationStrategy> {
     private _isReadyToTranslate;
     private combinedTranslations;
     private database;
+    private sourcesCachedFromDB;
     constructor(srcFile: string | string[] | undefined, srcString: string | string[] | undefined, _createTranslationStrategy: {
         new (): T;
     }, useSavedTranslations?: boolean);

@@ -35,6 +35,14 @@ class TranslationStrategy {
     addTranslation(key, options) {
         this.evaluatedTranslations.push(this.applyStrategy(key, options));
     }
+    addTranslationsFromDatabase(translations) {
+        while (translations.length != 0) {
+            const targetKey = translations[0].key;
+            const translationsForKey = translations.filter((value) => value.key === targetKey).map((value) => new Translation(targetKey, value.translation, value.language));
+            this.evaluatedTranslations.push(this.applyStrategy(targetKey, translationsForKey));
+            translations = translations.filter((value) => value.key != targetKey);
+        }
+    }
     translate(key) {
         return __awaiter(this, void 0, void 0, function* () {
             return new Promise((resolve, reject) => {
@@ -99,8 +107,6 @@ class AllSameLanguage extends TranslationStrategy {
             }
         }
     }
-    addTranslationsFromDatabase(translations) {
-    }
 }
 exports.AllSameLanguage = AllSameLanguage;
 class BestMatch extends TranslationStrategy {
@@ -137,8 +143,6 @@ class BestMatch extends TranslationStrategy {
         }
     }
     findTargetLanguage(translations) {
-    }
-    addTranslationsFromDatabase(translations) {
     }
 }
 exports.BestMatch = BestMatch;

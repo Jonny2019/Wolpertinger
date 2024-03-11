@@ -8,6 +8,7 @@ export class Wolpertinger<T extends TranslationStrategy> {
     private _isReadyToTranslate: boolean = false;
     private combinedTranslations: TranslationObject[] = [];
     private database: Database | undefined;
+    private sourcesCachedFromDB: number = 0;
 
     constructor(
         srcFile: string | string[] | undefined,
@@ -45,28 +46,35 @@ export class Wolpertinger<T extends TranslationStrategy> {
 
     private async evaluateSources(): Promise<void> {
         const numberOfSources: number = this.scrFiles.length + this.srcStrings.length;
-        // console.log(`Starting evaluation of ${this.combinedTranslations.length} sources`);
-        let numberOfEvaluatedSources: number = 0;
+        console.log(`Starting evaluation of ${this.combinedTranslations.length} sources`);
+        let numberOfEvaluatedSources: number = this.sourcesCachedFromDB;
         this.translationStrategy.findTargetLanguage(this.combinedTranslations);
 
         return new Promise((resolve) => {
-            this.combinedTranslations.forEach((translationObject: TranslationObject) => {
-                // console.log(`Finding matching translation from ${translationObject}`);
-                const key: string = translationObject.key;
-                const availableTranslations: Translation[] = [];
+            if (numberOfEvaluatedSources === numberOfSources) {
+                console.log(`All sources have already benn evaluated.`);
+                this._isReadyToTranslate = true;
+                resolve();
+            } else {
+                console.log("Evaluation is being carried out")
+                this.combinedTranslations.forEach((translationObject: TranslationObject) => {
+                    console.log(`Finding matching translation from ${translationObject}`);
+                    const key: string = translationObject.key;
+                    const availableTranslations: Translation[] = [];
 
-                (translationObject.values as LanguageValuePair[]).forEach((pair: LanguageValuePair) => {
-                    availableTranslations.push(new Translation(key, pair.value, pair.lang));
+                    (translationObject.values as LanguageValuePair[]).forEach((pair: LanguageValuePair) => {
+                        availableTranslations.push(new Translation(key, pair.value, pair.lang));
+                    });
+
+                    this.translationStrategy.addTranslation(key, availableTranslations);
+
+                    numberOfEvaluatedSources++;
+                    if (numberOfEvaluatedSources === numberOfSources) {
+                        this._isReadyToTranslate = true;
+                        resolve();
+                    }
                 });
-
-                this.translationStrategy.addTranslation(key, availableTranslations);
-
-                numberOfEvaluatedSources++;
-                if (numberOfEvaluatedSources === numberOfSources) {
-                    this._isReadyToTranslate = true;
-                    resolve();
-                }
-            });
+            }
         });
     }
 
@@ -127,11 +135,29 @@ export class Wolpertinger<T extends TranslationStrategy> {
                                                         translations
                                                     );
                                                 });
+                                                numberOfLoadedSources++;
+
+                                                if (numberOfLoadedSources === numberOfSources) {
+                                                    this.evaluateSources().then(() => {
+                                                        this._isReadyToTranslate = true;
+                                                        resolve(true);
+                                                    });
+                                                }
                                             });
                                         } else {
+                                            console.log(`retrieving Translations with fileId = ${entry.id}`);
                                             (this.database as Database).getTranslationsWithFileId(entry.id).then((entries: TranslationDatabaseEntry[]) => {
                                                 console.log(entries);
                                                 this.translationStrategy.addTranslationsFromDatabase(entries);
+                                                numberOfLoadedSources++;
+                                                this.sourcesCachedFromDB++;
+
+                                                if (numberOfLoadedSources === numberOfSources) {
+                                                    this.evaluateSources().then(() => {
+                                                        this._isReadyToTranslate = true;
+                                                        resolve(true);
+                                                    });
+                                                }
                                             });
                                         }
                                 });

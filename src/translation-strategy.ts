@@ -44,7 +44,21 @@ export abstract class TranslationStrategy {
 
     abstract findTargetLanguage(translations: TranslationObject[]): void;
 
-    abstract addTranslationsFromDatabase(translations: TranslationDatabaseEntry[]): void;
+    public addTranslationsFromDatabase(translations: TranslationDatabaseEntry[]): void {
+        while (translations.length != 0) {
+            const targetKey: string = translations[0].key;
+            const translationsForKey: Translation[] = translations.filter(
+                (value: TranslationDatabaseEntry) => value.key === targetKey
+            ).map(
+                (value: TranslationDatabaseEntry) => new Translation(targetKey, value.translation, value.language)
+            );
+
+            this.evaluatedTranslations.push(this.applyStrategy(targetKey, translationsForKey));
+            translations = translations.filter(
+                (value: TranslationDatabaseEntry) => value.key != targetKey
+            )
+        }
+    }
 
     public async translate(key: string): Promise<string> {
         return new Promise((resolve, reject) => {
@@ -114,9 +128,6 @@ export class AllSameLanguage extends TranslationStrategy {
 
     }
 
-    addTranslationsFromDatabase(translations: TranslationDatabaseEntry[]): void {
-    }
-
 }
 
 export class BestMatch extends TranslationStrategy {
@@ -154,9 +165,6 @@ export class BestMatch extends TranslationStrategy {
     }
 
     override findTargetLanguage(translations: TranslationObject[]) {
-    }
-
-    addTranslationsFromDatabase(translations: TranslationDatabaseEntry[]): void {
     }
 
 }

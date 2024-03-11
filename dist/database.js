@@ -63,16 +63,14 @@ class Database {
                 language: translation.language,
                 translation: translation.text
             };
-            if (this.translationsStore === undefined)
-                this.translationsStore = this.savedTranslationsStore;
+            this.translationsStore = this.savedTranslationsStore;
             this.translationsStore.add(obj);
         });
     }
     addFileEntry(url) {
         return __awaiter(this, void 0, void 0, function* () {
             return new Promise((resolve, reject) => {
-                if (this.filesStore === undefined)
-                    this.filesStore = this.savedFilesStore;
+                this.filesStore = this.savedFilesStore;
                 const obj = {
                     timestamp: Date.now(),
                     url: url
@@ -91,8 +89,7 @@ class Database {
     areTranslationsSaved(url) {
         return __awaiter(this, void 0, void 0, function* () {
             return new Promise((resolve) => {
-                if (this.filesStore === undefined)
-                    this.filesStore = this.savedFilesStore;
+                this.filesStore = this.savedFilesStore;
                 const cursorRequest = this.filesStore.openCursor();
                 cursorRequest.onsuccess = (event) => {
                     const cursor = event.target.result;
@@ -118,9 +115,7 @@ class Database {
     getTranslationsWithFileId(fileId) {
         return __awaiter(this, void 0, void 0, function* () {
             return new Promise((resolve, reject) => {
-                if (this.translationsStore === undefined) {
-                    this.translationsStore = this.savedTranslationsStore;
-                }
+                this.translationsStore = this.savedTranslationsStore;
                 const translations = [];
                 const cursorRequest = this.translationsStore.openCursor();
                 cursorRequest.onsuccess = (event) => {
