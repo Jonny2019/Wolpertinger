@@ -51,19 +51,15 @@ class Wolpertinger {
     evaluateSources() {
         return __awaiter(this, void 0, void 0, function* () {
             const numberOfSources = this.scrFiles.length + this.srcStrings.length;
-            console.log(`Starting evaluation of ${this.combinedTranslations.length} sources`);
             let numberOfEvaluatedSources = this.sourcesCachedFromDB;
             this.translationStrategy.findTargetLanguage(this.combinedTranslations);
             return new Promise((resolve) => {
                 if (numberOfEvaluatedSources === numberOfSources) {
-                    console.log(`All sources have already benn evaluated.`);
                     this._isReadyToTranslate = true;
                     resolve();
                 }
                 else {
-                    console.log("Evaluation is being carried out");
                     this.combinedTranslations.forEach((translationObject) => {
-                        console.log(`Finding matching translation from ${translationObject}`);
                         const key = translationObject.key;
                         const availableTranslations = [];
                         translationObject.values.forEach((pair) => {
@@ -132,9 +128,7 @@ class Wolpertinger {
                                             });
                                         }
                                         else {
-                                            console.log(`retrieving Translations with fileId = ${entry.id}`);
                                             this.database.getTranslationsWithFileId(entry.id).then((entries) => {
-                                                console.log(entries);
                                                 this.translationStrategy.addTranslationsFromDatabase(entries);
                                                 numberOfLoadedSources++;
                                                 this.sourcesCachedFromDB++;

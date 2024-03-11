@@ -46,19 +46,19 @@ export class Wolpertinger<T extends TranslationStrategy> {
 
     private async evaluateSources(): Promise<void> {
         const numberOfSources: number = this.scrFiles.length + this.srcStrings.length;
-        console.log(`Starting evaluation of ${this.combinedTranslations.length} sources`);
+        //console.log(`Starting evaluation of ${this.combinedTranslations.length} sources`);
         let numberOfEvaluatedSources: number = this.sourcesCachedFromDB;
         this.translationStrategy.findTargetLanguage(this.combinedTranslations);
 
         return new Promise((resolve) => {
             if (numberOfEvaluatedSources === numberOfSources) {
-                console.log(`All sources have already benn evaluated.`);
+                //console.log(`All sources have already benn evaluated.`);
                 this._isReadyToTranslate = true;
                 resolve();
             } else {
-                console.log("Evaluation is being carried out")
+                //console.log("Evaluation is being carried out")
                 this.combinedTranslations.forEach((translationObject: TranslationObject) => {
-                    console.log(`Finding matching translation from ${translationObject}`);
+                    //console.log(`Finding matching translation from ${translationObject}`);
                     const key: string = translationObject.key;
                     const availableTranslations: Translation[] = [];
 
@@ -145,9 +145,9 @@ export class Wolpertinger<T extends TranslationStrategy> {
                                                 }
                                             });
                                         } else {
-                                            console.log(`retrieving Translations with fileId = ${entry.id}`);
+                                            //console.log(`retrieving Translations with fileId = ${entry.id}`);
                                             (this.database as Database).getTranslationsWithFileId(entry.id).then((entries: TranslationDatabaseEntry[]) => {
-                                                console.log(entries);
+                                                //console.log(entries);
                                                 this.translationStrategy.addTranslationsFromDatabase(entries);
                                                 numberOfLoadedSources++;
                                                 this.sourcesCachedFromDB++;
