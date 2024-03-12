@@ -1,2 +1,3 @@
 export { Wolpertinger } from "./wolpertinger";
-export { TranslationStrategy, Translation, TranslationsArray, BestMatch } from "./translation-strategy";
+export { TranslationStrategy, Translation, BestMatch } from "./translation-strategy";
+export { CookieWorker } from "./CookieWorker";

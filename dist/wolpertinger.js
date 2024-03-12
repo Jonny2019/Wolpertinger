@@ -13,13 +13,14 @@ exports.Wolpertinger = void 0;
 const translation_strategy_1 = require("./translation-strategy");
 const database_1 = require("./database");
 class Wolpertinger {
-    constructor(srcFile, srcString, _createTranslationStrategy, useSavedTranslations = true) {
+    constructor(srcFile, srcString, _createTranslationStrategy, useSavedTranslations = true, useLanguageCookie = true) {
         this._createTranslationStrategy = _createTranslationStrategy;
         this.useSavedTranslations = useSavedTranslations;
+        this.useLanguageCookie = useLanguageCookie;
         this._isReadyToTranslate = false;
         this.combinedTranslations = [];
         this.sourcesCachedFromDB = 0;
-        this.translationStrategy = new this._createTranslationStrategy();
+        this.translationStrategy = new this._createTranslationStrategy(this.useLanguageCookie);
         if (srcFile != undefined || srcString != undefined) {
             if (srcFile != undefined) {
                 if (typeof (srcFile) === "string") {

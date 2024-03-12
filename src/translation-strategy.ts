@@ -1,6 +1,4 @@
-export interface TranslationsArray {
-    [key: string]: string;
-}
+import {CookieWorker} from "./CookieWorker";
 
 interface OccurrenceCounter {
     [key: string]: number;
@@ -25,15 +23,26 @@ export abstract class TranslationStrategy {
     protected evaluatedTranslations: Translation[] = [];
     protected targetLanguage: string | undefined;
 
-    constructor() {
+    constructor(
+        protected readonly useLanguageCookie: boolean
+    ) {
         this.acceptedLanguages = this.allUniqueAcceptedLanguages()
         this.preferredLanguage = navigator.language.substring(0, 2);
     }
 
     protected allUniqueAcceptedLanguages(): string[] {
-        return (navigator.languages as string[])
-            .map((value: string) => value.substring(0,2))
-            .filter((value: string, index: number, array: string[]) => array.indexOf(value) === index);
+        const acceptedLanguages: string[] = [];
+        if (this.useLanguageCookie) {
+            const preferredLanguage: string | undefined = CookieWorker.savedPreferredLanguage;
+            if (preferredLanguage != undefined) {
+                acceptedLanguages.push(preferredLanguage);
+            }
+        }
+        
+        acceptedLanguages.concat((navigator.languages as string[])
+            .map((value: string) => value.substring(0,2)));
+
+        return acceptedLanguages.filter((value: string, index: number, array: string[]) => array.indexOf(value) === index);
     }
 
     public addTranslation(key: string, options: Translation[]) {

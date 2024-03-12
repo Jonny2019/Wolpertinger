@@ -13,10 +13,11 @@ export class Wolpertinger<T extends TranslationStrategy> {
     constructor(
         srcFile: string | string[] | undefined,
         srcString: string | string[] | undefined,
-        private readonly _createTranslationStrategy: {new (): T},
-        private readonly useSavedTranslations: boolean = true
+        private readonly _createTranslationStrategy: {new(useLanguageCookie: boolean): T},
+        private readonly useSavedTranslations: boolean = true,
+        private readonly useLanguageCookie: boolean = true
     ) {
-        this.translationStrategy = new this._createTranslationStrategy();
+        this.translationStrategy = new this._createTranslationStrategy(this.useLanguageCookie);
 
         if (srcFile != undefined || srcString != undefined) {
             if (srcFile != undefined) {

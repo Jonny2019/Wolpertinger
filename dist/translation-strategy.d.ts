@@ -1,6 +1,3 @@
-export interface TranslationsArray {
-    [key: string]: string;
-}
 export declare class Translation {
     readonly key: string;
     readonly text: string;
@@ -9,11 +6,12 @@ export declare class Translation {
     matchesKey(key: string): boolean;
 }
 export declare abstract class TranslationStrategy {
+    protected readonly useLanguageCookie: boolean;
     protected acceptedLanguages: string[];
     protected preferredLanguage: string;
     protected evaluatedTranslations: Translation[];
     protected targetLanguage: string | undefined;
-    constructor();
+    constructor(useLanguageCookie: boolean);
     protected allUniqueAcceptedLanguages(): string[];
     addTranslation(key: string, options: Translation[]): void;
     abstract applyStrategy(key: string, options: Translation[]): Translation;

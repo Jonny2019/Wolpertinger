@@ -10,6 +10,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.BestMatch = exports.AllSameLanguage = exports.TranslationStrategy = exports.Translation = void 0;
+const CookieWorker_1 = require("./CookieWorker");
 class Translation {
     constructor(key, text, language) {
         this.key = key;
@@ -22,15 +23,23 @@ class Translation {
 }
 exports.Translation = Translation;
 class TranslationStrategy {
-    constructor() {
+    constructor(useLanguageCookie) {
+        this.useLanguageCookie = useLanguageCookie;
         this.evaluatedTranslations = [];
         this.acceptedLanguages = this.allUniqueAcceptedLanguages();
         this.preferredLanguage = navigator.language.substring(0, 2);
     }
     allUniqueAcceptedLanguages() {
-        return navigator.languages
-            .map((value) => value.substring(0, 2))
-            .filter((value, index, array) => array.indexOf(value) === index);
+        const acceptedLanguages = [];
+        if (this.useLanguageCookie) {
+            const preferredLanguage = CookieWorker_1.CookieWorker.savedPreferredLanguage;
+            if (preferredLanguage != undefined) {
+                acceptedLanguages.push(preferredLanguage);
+            }
+        }
+        acceptedLanguages.concat(navigator.languages
+            .map((value) => value.substring(0, 2)));
+        return acceptedLanguages.filter((value, index, array) => array.indexOf(value) === index);
     }
     addTranslation(key, options) {
         this.evaluatedTranslations.push(this.applyStrategy(key, options));
