@@ -3,7 +3,7 @@ A library that fills in translations / localisations from JSON files and strings
 
 ## Installation
 You can add Wolpertinger to your Node project by running
-`npm install wolpertinger`.
+`npm i @scivolemo/wolpertinger`.
 
 ## Usage
 To make Wolpertinger fill in translations from your sources use it like this:

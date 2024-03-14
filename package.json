@@ -1,13 +1,27 @@
 {
-  "name": "wolpertinger",
-  "version": "0.0.1",
-  "description": "",
+  "name": "@scivolemo/wolpertinger",
+  "version": "1.0.0",
+  "description": "A library that fills in translations / localisations from JSON files and strings depending on the user's language preferences.",
   "main": "dist/index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "dev": "echo \"Running in dev mode...\" && tsc --watch"
   },
-  "keywords": [],
+  "keywords": [
+    "translation",
+    "IndexedDB",
+    "internationalization",
+    "async",
+    "TypeScript"
+  ],
   "author": "Justus Bendel",
-  "license": "MIT"
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Jonny2019/Wolpertinger.git"
+  },
+  "bugs": {
+    "url": "https://github.com/Jonny2019/Wolpertinger/issues"
+  },
+  "homepage": "https://github.com/Jonny2019/Wolpertinger#readme"
 }
