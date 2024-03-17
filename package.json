@@ -1,6 +1,6 @@
 {
   "name": "@scivolemo/wolpertinger",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "A library that fills in translations / localisations from JSON files and strings depending on the user's language preferences.",
   "main": "dist/index.js",
   "scripts": {

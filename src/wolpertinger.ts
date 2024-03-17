@@ -2,6 +2,10 @@ import {TranslationStrategy, Translation} from "./translation-strategy";
 import {Database} from "./database";
 
 export class Wolpertinger<T extends TranslationStrategy> {
+    public static readonly ATTRIBUTE_NAME_TRANSLATION: string = "data-translation";
+    public static readonly ATTRIBUTE_NAME_LOCALIZED_IMAGE: string = "data-localized-img";
+    public static readonly ATTRIBUTE_NAME_LOCALIZED_ALT: string = "data-localized-alt";
+
     public readonly scrFiles: string[];
     public readonly srcStrings: string[];
     private readonly translationStrategy: T;
@@ -212,9 +216,9 @@ export class Wolpertinger<T extends TranslationStrategy> {
         //console.log(`Starting translation`);
         return new Promise((resolve, reject) => {
             if (this.isReadyToTranslate) {
-                for (const p of document.querySelectorAll("p, h1, h2, h3, h4, h5")) {
-                    if (p.hasAttribute("data-translation")) {
-                        const key: string = p.getAttribute("data-translation") as string;
+                for (const p of document.querySelectorAll("p, h1, h2, h3, h4, h5, img")) {
+                    if (p.hasAttribute(Wolpertinger.ATTRIBUTE_NAME_TRANSLATION)) {
+                        const key: string = p.getAttribute(Wolpertinger.ATTRIBUTE_NAME_TRANSLATION) as string;
                         this.translationStrategy.translate(key).then((translation: string) => {
                             //console.log(`Translating ${key} with ${translation}`);
                             p.innerHTML = translation;
@@ -223,6 +227,18 @@ export class Wolpertinger<T extends TranslationStrategy> {
                                 p.innerHTML = errorText;
                             }
                         });
+                    } else if (p.hasAttribute(Wolpertinger.ATTRIBUTE_NAME_LOCALIZED_IMAGE)) {
+                        const keySrc: string = p.getAttribute(Wolpertinger.ATTRIBUTE_NAME_LOCALIZED_IMAGE) as string;
+                        this.translationStrategy.translate(keySrc).then((src: string) => {
+                            (p as HTMLImageElement).src = src;
+                        });
+
+                        if (p.hasAttribute(Wolpertinger.ATTRIBUTE_NAME_LOCALIZED_ALT)) {
+                            const keyAlt: string = p.getAttribute(Wolpertinger.ATTRIBUTE_NAME_LOCALIZED_ALT) as string;
+                            this.translationStrategy.translate(keyAlt).then((alt: string) => {
+                                (p as HTMLImageElement).alt = alt;
+                            });
+                        }
                     }
                 }
 

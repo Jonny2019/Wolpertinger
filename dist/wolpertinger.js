@@ -188,9 +188,9 @@ class Wolpertinger {
         return __awaiter(this, void 0, void 0, function* () {
             return new Promise((resolve, reject) => {
                 if (this.isReadyToTranslate) {
-                    for (const p of document.querySelectorAll("p, h1, h2, h3, h4, h5")) {
-                        if (p.hasAttribute("data-translation")) {
-                            const key = p.getAttribute("data-translation");
+                    for (const p of document.querySelectorAll("p, h1, h2, h3, h4, h5, img")) {
+                        if (p.hasAttribute(Wolpertinger.ATTRIBUTE_NAME_TRANSLATION)) {
+                            const key = p.getAttribute(Wolpertinger.ATTRIBUTE_NAME_TRANSLATION);
                             this.translationStrategy.translate(key).then((translation) => {
                                 p.innerHTML = translation;
                             }).catch(reason => {
@@ -198,6 +198,18 @@ class Wolpertinger {
                                     p.innerHTML = errorText;
                                 }
                             });
+                        }
+                        else if (p.hasAttribute(Wolpertinger.ATTRIBUTE_NAME_LOCALIZED_IMAGE)) {
+                            const keySrc = p.getAttribute(Wolpertinger.ATTRIBUTE_NAME_LOCALIZED_IMAGE);
+                            this.translationStrategy.translate(keySrc).then((src) => {
+                                p.src = src;
+                            });
+                            if (p.hasAttribute(Wolpertinger.ATTRIBUTE_NAME_LOCALIZED_ALT)) {
+                                const keyAlt = p.getAttribute(Wolpertinger.ATTRIBUTE_NAME_LOCALIZED_ALT);
+                                this.translationStrategy.translate(keyAlt).then((alt) => {
+                                    p.alt = alt;
+                                });
+                            }
                         }
                     }
                     resolve(true);
@@ -210,3 +222,6 @@ class Wolpertinger {
     }
 }
 exports.Wolpertinger = Wolpertinger;
+Wolpertinger.ATTRIBUTE_NAME_TRANSLATION = "data-translation";
+Wolpertinger.ATTRIBUTE_NAME_LOCALIZED_IMAGE = "data-localized-img";
+Wolpertinger.ATTRIBUTE_NAME_LOCALIZED_ALT = "data-localized-alt";
